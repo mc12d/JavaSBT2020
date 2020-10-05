@@ -1,8 +1,6 @@
 package hw1;
 
 
-import javax.management.RuntimeErrorException;
-
 public class Customer {
     private final String name;
     private final String lastName;
