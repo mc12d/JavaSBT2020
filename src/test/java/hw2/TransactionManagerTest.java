@@ -38,4 +38,20 @@ public class TransactionManagerTest {
                 accounts.get(0)
         ));
     }
+
+    @Test
+    public void executeTest() {
+        // given
+        TransactionManager tmanager = new TransactionManager();
+        Account acc1 = new Account(0, tmanager);
+        Transaction t1 = tmanager.createTransaction(100, null, acc1);
+        assertNotNull(t1);
+        assertNotNull(tmanager);
+        // when
+        tmanager.executeTransaction(t1);
+
+        // then
+        assertNotNull(acc1.entries.last());
+        assertEquals(100, acc1.entries.last().getAmount());
+    }
 }

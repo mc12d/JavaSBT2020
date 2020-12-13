@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.NavigableSet;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -34,15 +33,15 @@ public class Entries {
 
     Collection<Entry> betweenDates(LocalDate from, LocalDate to) {
         LocalDateTime dateBegin = LocalDateTime.of(from, LocalTime.MIN),
-                      dateEnd   = LocalDateTime.of(to, LocalTime.MAX);
+                dateEnd = LocalDateTime.of(to, LocalTime.MAX);
         return entData.subSet(
                 new Entry(null, null, 0, dateBegin), true,
-                new Entry(null, null, 0, dateEnd),   true
+                new Entry(null, null, 0, dateEnd), true
         );
 
     }
 
     Entry last() {
-        return entData.pollLast();
+        return entData.last();
     }
 }

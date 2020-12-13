@@ -4,12 +4,17 @@ import java.util.*;
 
 public class AnalyticsManager {
     private final TransactionManager transactionManager;
+
     private class ComparatorByAmountDescending implements Comparator<Transaction> {
         @Override
         public int compare(Transaction t, Transaction t1) {
-            if (t.getAmount() < t1.getAmount()) { return 1; }
-            else if (t.getAmount() == t1.getAmount()) { return 0; }
-            else { return -1; }
+            if (t.getAmount() < t1.getAmount()) {
+                return 1;
+            } else if (t.getAmount() == t1.getAmount()) {
+                return 0;
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -19,17 +24,17 @@ public class AnalyticsManager {
 
     public Account mostFrequentBeneficiaryOfAccount(Account account) {
         if (account == null) {
-            return null;
+            throw new NullPointerException("Account must be non-null");
         }
         Collection<Transaction> transactionsByAccount = transactionManager.findAllTransactionsByAccount(account);
-        Map<Account, Integer> occurenceCount = new HashMap<>();
+        Map<Account, Integer> occurrenceCount = new HashMap<>();
         for (Transaction t : transactionsByAccount) {
             if (t.getBeneficiary() != null) {
-                int curCount = occurenceCount.get(t.getBeneficiary());
-                occurenceCount.put(t.getBeneficiary(), curCount + 1);
+                int curCount = occurrenceCount.getOrDefault(t.getBeneficiary(), 0);
+                occurrenceCount.put(t.getBeneficiary(), curCount + 1);
             }
         }
-        return Collections.max(occurenceCount.entrySet(), Map.Entry.comparingByValue()).getKey();
+        return Collections.max(occurrenceCount.entrySet(), Map.Entry.comparingByValue()).getKey();
     }
 
 

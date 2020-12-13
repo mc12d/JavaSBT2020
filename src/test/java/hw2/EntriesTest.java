@@ -1,13 +1,12 @@
 package hw2;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.TreeSet;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EntriesTest {
     @Test

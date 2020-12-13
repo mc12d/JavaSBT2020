@@ -3,16 +3,16 @@ package hw2;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AnalyticsManagerTest {
 
     @Test
     public void mostFrequentBeneficiaryTest() {
+        // given
         TransactionManager tmanager = new TransactionManager();
         AnalyticsManager manager = new AnalyticsManager(tmanager);
 
@@ -20,18 +20,20 @@ public class AnalyticsManagerTest {
         for (int i = 0; i < 10; i++) {
             accounts.add(new Account(i, tmanager));
         }
-
         Account originator = accounts.get(0);
         originator.addCash(10000);
 
+        // when
         originator.withdraw(100, accounts.get(1));
         originator.withdraw(100, accounts.get(1));
         originator.withdraw(100, accounts.get(2));
         originator.withdraw(100, accounts.get(2));
         originator.withdraw(100, accounts.get(2));
         originator.withdraw(100, accounts.get(8));
-        originator.withdraw(100, accounts.get(10));
+        originator.withdraw(100, accounts.get(9));
 
+        // then
+        Account mostFrequentAccount = accounts.get(2);
         assertEquals(
                 accounts.get(2),
                 manager.mostFrequentBeneficiaryOfAccount(originator)
@@ -40,15 +42,12 @@ public class AnalyticsManagerTest {
 
     @Test
     public void topExpensivePurchasesTest() {
+        // given
         TransactionManager tmanager = new TransactionManager();
         AnalyticsManager manager = new AnalyticsManager(tmanager);
 
         Account account = new Account(0, tmanager);
         Account beneficiary = new Account(1, tmanager);
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            manager.topExpensivePurchases(account, -1);
-        });
 
         account.addCash(10000);
         account.withdraw(100, beneficiary);
@@ -58,7 +57,19 @@ public class AnalyticsManagerTest {
         account.withdraw(500, beneficiary);
         account.withdraw(600, beneficiary);
 
-        Iterator<Transaction> iterator = manager.topExpensivePurchases(account, 3).iterator();
+        // when
+        int topN1 = -1;
+
+        // then
+        assertThrows(IllegalArgumentException.class, () -> {
+            manager.topExpensivePurchases(account, topN1);
+        });
+
+        // when
+        int topN2 = 3;
+
+        //then
+        Iterator<Transaction> iterator = manager.topExpensivePurchases(account, topN2).iterator();
         assertEquals(
                 600,
                 iterator.next().getAmount()
@@ -67,7 +78,9 @@ public class AnalyticsManagerTest {
                 500,
                 iterator.next().getAmount()
         );
+        assertEquals(
+                400,
+                iterator.next().getAmount()
+        );
     }
-
-
 }

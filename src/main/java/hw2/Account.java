@@ -13,15 +13,6 @@ public class Account {
         this.transactionManager = transactionManager;
         this.entries = new Entries();
     }
-    /*
-    void addEntry(Entry ent) {
-        entries.addEntry(ent);
-    }
-
-    void removeEntry(Entry ent) {
-        entries.
-    }
-     */
 
     /**
      * Withdraws money from account. <b>Should use TransactionManager to manage transactions</b>
@@ -33,12 +24,21 @@ public class Account {
      */
     public boolean withdraw(double amount, Account beneficiary) {
         if (beneficiary == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Unable to withdraw if beneficiary is null");
         }
         if (amount <= 0 || amount > balanceOn(LocalDate.now())) {
             return false;
         }
         Transaction t = transactionManager.createTransaction(amount, this, beneficiary);
+        if (t != null) {
+            transactionManager.executeTransaction(t);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean createAndExecuteTransaction(Account originator, Account beneficiary, double amount) {
+        Transaction t = transactionManager.createTransaction(amount, originator, beneficiary);
         if (t != null) {
             transactionManager.executeTransaction(t);
             return true;
@@ -58,12 +58,7 @@ public class Account {
         if (amount <= 0 || amount > balanceOn(LocalDate.now())) {
             return false;
         }
-        Transaction t = transactionManager.createTransaction(amount, this, null);
-        if (t != null) {
-            transactionManager.executeTransaction(t);
-            return true;
-        }
-        return false;
+        return createAndExecuteTransaction(this, null, amount);
     }
 
     /**
@@ -78,12 +73,7 @@ public class Account {
         if (amount <= 0) {
             return false;
         }
-        Transaction t = transactionManager.createTransaction(amount, null, this);
-        if (t != null) {
-            transactionManager.executeTransaction(t);
-            return true;
-        }
-        return false;
+        return createAndExecuteTransaction(null, this, amount);
     }
 
 
@@ -93,6 +83,7 @@ public class Account {
 
     /**
      * Calculates balance on the accounting entries basis
+     *
      * @param date
      * @return balance
      */
@@ -100,7 +91,7 @@ public class Account {
         Collection<Entry> entriesFrame = entries.to(date);
         double balance = 0;
         for (Entry e : entriesFrame) {
-            balance += e.isTransactionRolledBack() ? -e.getAmount() : e.getAmount();
+            balance += e.getAmount();
         }
         return balance;
     }

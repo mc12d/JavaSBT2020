@@ -1,5 +1,6 @@
 package hw2;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,16 +10,16 @@ import java.util.Map;
  * Manages all transactions within the application
  */
 public class TransactionManager {
-    // private Collection<Transaction> transactions;
 
     /**
-     is used for fast search by account
-     we do not delete transaction history, so I don't care about data consistency
+     * is used for fast search by account
+     * we do not delete transaction history, so I don't care about data consistency
      */
     private final Map<Long, Collection<Transaction>> transactions;
 
     /**
      * Creates and stores transactions
+     *
      * @param amount
      * @param originator
      * @param beneficiary
@@ -30,7 +31,7 @@ public class TransactionManager {
         if (originator == null && beneficiary == null) {
             throw new IllegalArgumentException("At least one account must be not null.");
         }
-        long transactionId = (long)transactions.size();
+        long transactionId = (long) transactions.size();
         Transaction t = new Transaction(
                 transactionId,
                 amount,
@@ -62,11 +63,49 @@ public class TransactionManager {
 
 
     public void rollbackTransaction(Transaction transaction) {
-        transaction.rollback();
+        Transaction rollbacked = transaction.rollback();
+
+        Account originator = rollbacked.getOriginator();
+        Account beneficiary = rollbacked.getBeneficiary();
+        if (originator != null) {
+            originator.entries.addEntry(new Entry(
+                    originator,
+                    rollbacked,
+                    -rollbacked.getAmount(),
+                    LocalDateTime.now()
+            ));
+        }
+        if (beneficiary != null) {
+            beneficiary.entries.addEntry(new Entry(
+                    beneficiary,
+                    rollbacked,
+                    rollbacked.getAmount(),
+                    LocalDateTime.now()
+            ));
+        }
     }
 
 
     public void executeTransaction(Transaction transaction) {
-        transaction.execute();
+        Transaction executed = transaction.execute();
+
+        Account originator = executed.getOriginator();
+        Account beneficiary = executed.getBeneficiary();
+        if (originator != null) {
+            originator.entries.addEntry(new Entry(
+                    originator,
+                    executed,
+                    -executed.getAmount(),
+                    LocalDateTime.now()
+            ));
+        }
+        if (beneficiary != null) {
+            beneficiary.entries.addEntry(new Entry(
+                    beneficiary,
+                    executed,
+                    executed.getAmount(),
+                    LocalDateTime.now()
+            ));
+        }
     }
 }

@@ -1,7 +1,5 @@
 package hw2;
 
-import java.time.LocalDateTime;
-
 public class Transaction {
     private final long id;
     private final double amount;
@@ -31,31 +29,18 @@ public class Transaction {
         this.rolledBack = rolledBack;
     }
 
-    public long id() { return id; }
+    public long id() {
+        return id;
+    }
 
     /**
      * Adding entries to both accounts
+     *
      * @throws IllegalStateException when was already executed
      */
     public Transaction execute() {
         if (executed) {
             throw new IllegalStateException("Already executed.");
-        }
-        if (originator != null) {
-            originator.entries.addEntry(new Entry(
-                    originator,
-                    this,
-                    -amount,
-                    LocalDateTime.now()
-            ));
-        }
-        if (beneficiary != null) {
-            beneficiary.entries.addEntry(new Entry(
-                    beneficiary,
-                    this,
-                    amount,
-                    LocalDateTime.now()
-            ));
         }
         return new Transaction(
                 id,
@@ -70,15 +55,16 @@ public class Transaction {
     /**
      * my comment : as I understand, we are not deleting anything from history
      * so I'm adding rollbacked transaction to account entries instead
-     *
+     * <p>
      * Removes all entries of current transaction from originator and beneficiary
+     *
      * @throws IllegalStateException when was already rolled back
      */
     public Transaction rollback() {
         if (rolledBack) {
             throw new IllegalStateException("Already rolled back.");
         }
-        Transaction t = new Transaction(
+        return new Transaction(
                 id,
                 amount,
                 originator,
@@ -86,24 +72,6 @@ public class Transaction {
                 executed,
                 true
         );
-        if (originator != null) {
-            originator.entries.addEntry(new Entry(
-                    originator,
-                    t,
-                    -amount,
-                    LocalDateTime.now()
-            ));
-        }
-        if (beneficiary != null) {
-            beneficiary.entries.addEntry(new Entry(
-                    originator,
-                    t,
-                    amount,
-                    LocalDateTime.now()
-            ));
-        }
-
-        return t;
     }
 
     boolean isRolledback() {

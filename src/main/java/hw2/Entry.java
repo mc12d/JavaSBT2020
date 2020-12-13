@@ -33,15 +33,12 @@ public class Entry implements Comparable<Entry> {
         else {
             if (this.transaction == null && e.transaction == null) {
                 return 0;
-            }
-            else if (this.transaction == null) {
+            } else if (this.transaction == null) {
                 return -1;
-            }
-            else if (e.transaction == null) {
+            } else if (e.transaction == null) {
                 return 1;
-            }
-            else {
-                return (int)(this.transaction.id() - e.transaction.id());
+            } else {
+                return (int) (this.transaction.id() - e.transaction.id());
             }
         }
     }
