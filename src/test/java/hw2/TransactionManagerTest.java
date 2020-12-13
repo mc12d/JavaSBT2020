@@ -3,14 +3,18 @@ package hw2;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionManagerTest {
     @Test
     public void createTransactionTest() {
+        // given
         TransactionManager tmanager = new TransactionManager();
 
+        // then
+        // exception must be thrown when both accounts in transaction is null
         assertThrows(IllegalArgumentException.class, () -> {
             tmanager.createTransaction(
                     100, null, null
@@ -20,23 +24,31 @@ public class TransactionManagerTest {
 
     @Test
     public void findByAccountTest() {
+        // given
         TransactionManager tmanager = new TransactionManager();
-        ArrayList<Transaction> groundTrue = new ArrayList<>();
+        ArrayList<Transaction> filteredAccounts = new ArrayList<>();
 
         ArrayList<Account> accounts = new ArrayList<>();
         accounts.add(new Account(0, tmanager));
         accounts.add(new Account(1, tmanager));
         accounts.add(new Account(2, tmanager));
 
+        // manually filling filteredAccounts with transactions with account id 0
+        // and creating transactions with other account ids
         for (int i = 0; i < 10; i++) {
             Transaction t = tmanager.createTransaction(100 + i, null, accounts.get(i % 3));
             if (i % 3 == 0) {
-                groundTrue.add(t);
+                filteredAccounts.add(t);
             }
         }
-        assertEquals(groundTrue, tmanager.findAllTransactionsByAccount(
+
+        // when
+        var filteredAccountsActual = tmanager.findAllTransactionsByAccount(
                 accounts.get(0)
-        ));
+        );
+
+        // then
+        assertEquals(filteredAccounts, filteredAccountsActual);
     }
 
     @Test
@@ -47,6 +59,7 @@ public class TransactionManagerTest {
         Transaction t1 = tmanager.createTransaction(100, null, acc1);
         assertNotNull(t1);
         assertNotNull(tmanager);
+
         // when
         tmanager.executeTransaction(t1);
 
