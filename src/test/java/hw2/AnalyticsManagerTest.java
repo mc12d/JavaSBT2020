@@ -16,11 +16,11 @@ public class AnalyticsManagerTest {
         TransactionManager tmanager = new TransactionManager();
         AnalyticsManager manager = new AnalyticsManager(tmanager);
 
-        ArrayList<Account> accounts = new ArrayList<>();
+        ArrayList<DebitCard> accounts = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            accounts.add(new Account(i, tmanager));
+            accounts.add(new DebitCard(i, tmanager));
         }
-        Account originator = accounts.get(0);
+        DebitCard originator = accounts.get(0);
         originator.addCash(10000);
 
         // when
@@ -33,7 +33,7 @@ public class AnalyticsManagerTest {
         originator.withdraw(100, accounts.get(9));
 
         // then
-        Account mostFrequentAccount = accounts.get(2);
+        DebitCard mostFrequentAccount = accounts.get(2);
         assertEquals(
                 accounts.get(2),
                 manager.mostFrequentBeneficiaryOfAccount(originator)
@@ -46,8 +46,8 @@ public class AnalyticsManagerTest {
         TransactionManager tmanager = new TransactionManager();
         AnalyticsManager manager = new AnalyticsManager(tmanager);
 
-        Account account = new Account(0, tmanager);
-        Account beneficiary = new Account(1, tmanager);
+        DebitCard account = new DebitCard(0, tmanager);
+        DebitCard beneficiary = new DebitCard(1, tmanager);
 
         account.addCash(10000);
         account.withdraw(100, beneficiary);

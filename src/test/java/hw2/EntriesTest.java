@@ -2,11 +2,9 @@ package hw2;
 
 import org.junit.jupiter.api.Test;
 
-import java.text.CollationElementIterator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Set;
 import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

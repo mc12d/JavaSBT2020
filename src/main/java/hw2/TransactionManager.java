@@ -26,8 +26,8 @@ public class TransactionManager {
      * @return created Transaction
      */
     public Transaction createTransaction(double amount,
-                                         Account originator,
-                                         Account beneficiary) {
+                                         DebitCard originator,
+                                         DebitCard beneficiary) {
         if (originator == null && beneficiary == null) {
             throw new IllegalArgumentException("At least one account must be not null.");
         }
@@ -57,7 +57,7 @@ public class TransactionManager {
     }
 
 
-    public Collection<Transaction> findAllTransactionsByAccount(Account account) {
+    public Collection<Transaction> findAllTransactionsByAccount(DebitCard account) {
         return transactions.getOrDefault(account.id(), new ArrayList<>());
     }
 
@@ -65,8 +65,8 @@ public class TransactionManager {
     public void rollbackTransaction(Transaction transaction) {
         Transaction rollbacked = transaction.rollback();
 
-        Account originator = rollbacked.getOriginator();
-        Account beneficiary = rollbacked.getBeneficiary();
+        DebitCard originator = rollbacked.getOriginator();
+        DebitCard beneficiary = rollbacked.getBeneficiary();
         if (originator != null) {
             originator.entries.addEntry(new Entry(
                     originator,
@@ -89,8 +89,8 @@ public class TransactionManager {
     public void executeTransaction(Transaction transaction) {
         Transaction executed = transaction.execute();
 
-        Account originator = executed.getOriginator();
-        Account beneficiary = executed.getBeneficiary();
+        DebitCard originator = executed.getOriginator();
+        DebitCard beneficiary = executed.getBeneficiary();
         if (originator != null) {
             originator.entries.addEntry(new Entry(
                     originator,
