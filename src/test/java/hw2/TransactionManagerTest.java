@@ -3,7 +3,6 @@ package hw2;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,10 +27,10 @@ public class TransactionManagerTest {
         TransactionManager tmanager = new TransactionManager();
         ArrayList<Transaction> filteredAccounts = new ArrayList<>();
 
-        ArrayList<Account> accounts = new ArrayList<>();
-        accounts.add(new Account(0, tmanager));
-        accounts.add(new Account(1, tmanager));
-        accounts.add(new Account(2, tmanager));
+        ArrayList<DebitCard> accounts = new ArrayList<>();
+        accounts.add(new DebitCard(0, tmanager));
+        accounts.add(new DebitCard(1, tmanager));
+        accounts.add(new DebitCard(2, tmanager));
 
         // manually filling filteredAccounts with transactions with account id 0
         // and creating transactions with other account ids
@@ -55,7 +54,7 @@ public class TransactionManagerTest {
     public void executeTest() {
         // given
         TransactionManager tmanager = new TransactionManager();
-        Account acc1 = new Account(0, tmanager);
+        DebitCard acc1 = new DebitCard(0, tmanager);
         Transaction t1 = tmanager.createTransaction(100, null, acc1);
         assertNotNull(t1);
         assertNotNull(tmanager);

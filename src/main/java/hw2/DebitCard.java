@@ -1,14 +1,16 @@
 package hw2;
 
+import hw3.Account;
+
 import java.time.LocalDate;
 import java.util.Collection;
 
-public class Account {
+public class DebitCard implements Account {
     private final long id;
-    private final TransactionManager transactionManager;
+    protected final TransactionManager transactionManager;
     final Entries entries;
 
-    public Account(long id, TransactionManager transactionManager) {
+    public DebitCard(long id, TransactionManager transactionManager) {
         this.id = id;
         this.transactionManager = transactionManager;
         this.entries = new Entries();
@@ -22,7 +24,7 @@ public class Account {
      * if amount &gt 0 and (currentBalance - amount) &ge 0,
      * otherwise returns false
      */
-    public boolean withdraw(double amount, Account beneficiary) {
+    public boolean withdraw(double amount, DebitCard beneficiary) {
         if (beneficiary == null) {
             throw new IllegalArgumentException("Unable to withdraw if beneficiary is null");
         }
@@ -37,7 +39,7 @@ public class Account {
         return false;
     }
 
-    private boolean createAndExecuteTransaction(Account originator, Account beneficiary, double amount) {
+    private boolean createAndExecuteTransaction(DebitCard originator, DebitCard beneficiary, double amount) {
         Transaction t = transactionManager.createTransaction(amount, originator, beneficiary);
         if (t != null) {
             transactionManager.executeTransaction(t);
@@ -87,6 +89,7 @@ public class Account {
      * @param date
      * @return balance
      */
+    @Override
     public double balanceOn(LocalDate date) {
         Collection<Entry> entriesFrame = entries.to(date);
         double balance = 0;
@@ -94,6 +97,11 @@ public class Account {
             balance += e.getAmount();
         }
         return balance;
+    }
+
+    @Override
+    public void addEntry(Entry entry) {
+        entries.addEntry(entry);
     }
 
     /**

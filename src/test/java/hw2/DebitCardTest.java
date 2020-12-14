@@ -6,13 +6,13 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AccountTest {
+public class DebitCardTest {
     @Test
     public void addWithdrawTest() throws InterruptedException {
         // given
         TransactionManager tmanager = new TransactionManager();
-        Account account = new Account(0, tmanager),
-                account1 = new Account(1, tmanager);
+        DebitCard account = new DebitCard(0, tmanager),
+                account1 = new DebitCard(1, tmanager);
 
         {
             // when
@@ -57,7 +57,7 @@ public class AccountTest {
     public void balanceOnTest() {
         // given
         TransactionManager tmanager = new TransactionManager();
-        Account account = new Account(0, tmanager);
+        DebitCard account = new DebitCard(0, tmanager);
 
         // when
         account.addCash(100);

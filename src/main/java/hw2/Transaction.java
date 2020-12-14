@@ -3,16 +3,16 @@ package hw2;
 public class Transaction {
     private final long id;
     private final double amount;
-    private final Account originator;
-    private final Account beneficiary;
+    private final DebitCard originator;
+    private final DebitCard beneficiary;
     private final boolean executed;
     private final boolean rolledBack;
 
 
     public Transaction(long id,
                        double amount,
-                       Account originator,
-                       Account beneficiary,
+                       DebitCard originator,
+                       DebitCard beneficiary,
                        boolean executed,
                        boolean rolledBack) {
         if (amount <= 0) {
@@ -78,11 +78,11 @@ public class Transaction {
         return rolledBack;
     }
 
-    Account getBeneficiary() {
+    DebitCard getBeneficiary() {
         return beneficiary;
     }
 
-    Account getOriginator() {
+    DebitCard getOriginator() {
         return originator;
     }
 

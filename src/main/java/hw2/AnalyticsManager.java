@@ -1,5 +1,9 @@
 package hw2;
 
+import hw3.Account;
+import hw3.KeyExtractor;
+
+import java.time.LocalDate;
 import java.util.*;
 
 public class AnalyticsManager {
@@ -8,13 +12,7 @@ public class AnalyticsManager {
     private class ComparatorByAmountDescending implements Comparator<Transaction> {
         @Override
         public int compare(Transaction t, Transaction t1) {
-            if (t.getAmount() < t1.getAmount()) {
-                return 1;
-            } else if (t.getAmount() == t1.getAmount()) {
-                return 0;
-            } else {
-                return -1;
-            }
+            return Double.compare(t1.getAmount(), t.getAmount());
         }
     }
 
@@ -22,12 +20,12 @@ public class AnalyticsManager {
         this.transactionManager = transactionManager;
     }
 
-    public Account mostFrequentBeneficiaryOfAccount(Account account) {
+    public DebitCard mostFrequentBeneficiaryOfAccount(DebitCard account) {
         if (account == null) {
             throw new NullPointerException("Account must be non-null");
         }
         Collection<Transaction> transactionsByAccount = transactionManager.findAllTransactionsByAccount(account);
-        Map<Account, Integer> occurrenceCount = new HashMap<>();
+        Map<DebitCard, Integer> occurrenceCount = new HashMap<>();
         for (Transaction t : transactionsByAccount) {
             if (t.getBeneficiary() != null) {
                 int curCount = occurrenceCount.getOrDefault(t.getBeneficiary(), 0);
@@ -38,7 +36,7 @@ public class AnalyticsManager {
     }
 
 
-    public Collection<Transaction> topExpensivePurchases(Account account, int topN) {
+    public Collection<Transaction> topExpensivePurchases(DebitCard account, int topN) {
         if (topN < 0) {
             throw new IllegalArgumentException("topN must be non-negative");
         }
@@ -56,5 +54,39 @@ public class AnalyticsManager {
             }
         }
         return result.size() == topN ? result : null;
+    }
+
+    public Double overallBalanceOfAccounts(List<? extends Account> accounts) {
+        double sum = 0;
+        for (var acc : accounts) {
+            sum += acc.balanceOn(LocalDate.now());
+        }
+        return sum;
+    }
+
+    public <K> Set<K> uniqueKeysOf(
+            List<? extends Account> accounts,
+            KeyExtractor<? extends K, ? super Account> extractor) {
+
+        Set<K> keySet = new HashSet<>();
+        for (var acc : accounts) {
+            keySet.add(extractor.extract(acc));
+        }
+        return keySet;
+    }
+
+    public List<Account> accountsRangeFrom(
+            List<? extends Account> accounts,
+            Account minAccount,
+            Comparator<? super Account> comparator) {
+
+        List<Account> filtered = new ArrayList<>();
+        for (var acc : accounts) {
+            if (comparator.compare(acc, minAccount) >= 0) {
+                filtered.add(acc);
+            }
+        }
+        filtered.sort(comparator);
+        return filtered;
     }
 }
