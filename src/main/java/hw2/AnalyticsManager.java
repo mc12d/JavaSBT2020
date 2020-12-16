@@ -5,34 +5,29 @@ import hw3.KeyExtractor;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AnalyticsManager {
     private final TransactionManager transactionManager;
-
-    private class ComparatorByAmountDescending implements Comparator<Transaction> {
-        @Override
-        public int compare(Transaction t, Transaction t1) {
-            return Double.compare(t1.getAmount(), t.getAmount());
-        }
-    }
 
     public AnalyticsManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+
     public DebitCard mostFrequentBeneficiaryOfAccount(DebitCard account) {
         if (account == null) {
             throw new NullPointerException("Account must be non-null");
         }
-        Collection<Transaction> transactionsByAccount = transactionManager.findAllTransactionsByAccount(account);
-        Map<DebitCard, Integer> occurrenceCount = new HashMap<>();
-        for (Transaction t : transactionsByAccount) {
-            if (t.getBeneficiary() != null) {
-                int curCount = occurrenceCount.getOrDefault(t.getBeneficiary(), 0);
-                occurrenceCount.put(t.getBeneficiary(), curCount + 1);
-            }
-        }
-        return Collections.max(occurrenceCount.entrySet(), Map.Entry.comparingByValue()).getKey();
+        return transactionManager.findAllTransactionsByAccount(account)
+                .stream()
+                .filter(acc -> acc.getBeneficiary() != null)
+                .collect(Collectors.groupingBy(Transaction::getBeneficiary, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
 
 
@@ -40,39 +35,31 @@ public class AnalyticsManager {
         if (topN < 0) {
             throw new IllegalArgumentException("topN must be non-negative");
         }
-        List<Transaction> transactionsByAccount = (List<Transaction>) transactionManager.findAllTransactionsByAccount(account);
-        transactionsByAccount.sort(new ComparatorByAmountDescending());
-
-        ArrayList<Transaction> result = new ArrayList<>();
-        for (int i = 0, j = 0; i < transactionsByAccount.size(); i++) {
-            if (transactionsByAccount.get(i).getOriginator() == account) {
-                result.add(transactionsByAccount.get(i));
-                j++;
-            }
-            if (j == topN) {
-                break;
-            }
-        }
-        return result.size() == topN ? result : null;
+        return transactionManager.findAllTransactionsByAccount(account)
+                .stream()
+                .filter(tr -> account.equals(tr.getOriginator()))
+                .filter(tr -> tr.getAmount() > topN)
+                .sorted(Comparator.comparingDouble(Transaction::getAmount).reversed())
+                .collect(Collectors.toList());
     }
 
     public Double overallBalanceOfAccounts(List<? extends Account> accounts) {
-        double sum = 0;
-        for (var acc : accounts) {
-            sum += acc.balanceOn(LocalDate.now());
-        }
-        return sum;
+        return accounts
+                .stream()
+                .filter(Objects::nonNull)
+                .mapToDouble(acc -> acc.balanceOn(LocalDate.now()))
+                .sum();
     }
 
     public <K> Set<K> uniqueKeysOf(
             List<? extends Account> accounts,
             KeyExtractor<? extends K, ? super Account> extractor) {
 
-        Set<K> keySet = new HashSet<>();
-        for (var acc : accounts) {
-            keySet.add(extractor.extract(acc));
-        }
-        return keySet;
+        return accounts
+                .stream()
+                .filter(Objects::nonNull)
+                .map(extractor::extract)
+                .collect(Collectors.toSet());
     }
 
     public List<Account> accountsRangeFrom(
@@ -80,13 +67,20 @@ public class AnalyticsManager {
             Account minAccount,
             Comparator<? super Account> comparator) {
 
-        List<Account> filtered = new ArrayList<>();
-        for (var acc : accounts) {
-            if (comparator.compare(acc, minAccount) >= 0) {
-                filtered.add(acc);
-            }
-        }
-        filtered.sort(comparator);
-        return filtered;
+        return accounts.stream()
+                .filter(Objects::nonNull)
+                .filter(acc -> comparator.compare(acc, minAccount) >= 0)
+                .sorted(comparator)
+                .collect(Collectors.toList());
+    }
+
+
+    public Optional<Entry> maxExpenseAmountEntryWithinInterval(List<DebitCard> accounts, LocalDate from, LocalDate to) {
+        return accounts
+                .stream()
+                .filter(Objects::nonNull)
+                .flatMap(acc -> acc.entries.betweenDates(from, to).stream())
+                .filter(ent -> ent.getAmount() < 0)
+                .min(Comparator.comparing(Entry::getAmount));
     }
 }

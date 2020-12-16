@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class AnalyticsManager {
@@ -79,5 +80,31 @@ public class AnalyticsManager {
         // then
         assertEquals(accounts.get(0).id(), ((DebitCard) rangeFrom.get(0)).id());
         assertEquals(accounts.get(1).id(), ((DebitCard) rangeFrom.get(1)).id());
+    }
+
+    @Test
+    public void maxExpenseAmountEntryWithinInterval() {
+        // given
+        var tManager = new TransactionManager();
+        var accounts = List.of(
+                new DebitCard(0, tManager),
+                new DebitCard(1, tManager),
+                new DebitCard(2, tManager)
+        );
+        accounts.get(0).addCash(100);
+        accounts.get(1).addCash(200);
+        accounts.get(2).addCash(80);
+
+        accounts.get(0).withdraw(50, accounts.get(1));
+        accounts.get(1).withdraw(220, accounts.get(2));
+        var analyticsManager = new hw2.AnalyticsManager(tManager);
+
+        // when
+        var result = analyticsManager
+                .maxExpenseAmountEntryWithinInterval(accounts, LocalDate.now().minusDays(1), LocalDate.now().plusDays(1));
+
+        // then
+        assertTrue(result.isPresent());
+        assertEquals(-220, result.get().getAmount());
     }
 }
